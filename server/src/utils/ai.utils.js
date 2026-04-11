@@ -37,10 +37,11 @@ const useHuggingFace = async (prompt, key) => {
 };
 
 import { GoogleGenAI } from "@google/genai";
+import config from "../config/config.js";
 
 // The client gets the API key from the environment variable `GEMINI_API_KEY`.
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: config.GEMINI_API_KEY,
 });
 
 export async function GeminiAPI(prompt) {

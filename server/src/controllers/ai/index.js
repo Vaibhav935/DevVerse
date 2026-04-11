@@ -1,3 +1,4 @@
+import config from "../../config/config.js";
 import useHuggingFace, { GeminiAPI } from "../../utils/ai.utils.js";
 import { customError, success } from "../../utils/response.utils.js";
 
@@ -9,7 +10,7 @@ export const chat = async (req, res) => {
       return customError(res, 400, {}, "Prompt is required.");
     }
 
-    const response = await useHuggingFace(prompt, process.env.HF_TOKEN);
+    const response = await useHuggingFace(prompt, config.HF_TOKEN);
 
     if (!response) {
       return customError(
