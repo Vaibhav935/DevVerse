@@ -1,9 +1,9 @@
 import React from "react";
 import SideBar from "./SideBar";
-import SideBarExpansion from "./SideBarExpansion";
-import CodeEditor from "./CodeEditor";
-import TerminalComponent from "./Terminal";
-import AiChatSidebar from "./AiChatSidebar";
+import SideBarExpansion from "@/features/layout/components/SideBarExpansion";
+import AiChatSidebar from "@/features/ai-chat/components/AiChatSideBar";
+import TerminalComponent from "@/features/terminal/components/Terminal";
+import CodeEditor from "@/features/editor/components/CodeEditor";
 
 const Body = () => {
   return (
