@@ -5,18 +5,13 @@ export const registerApi = asyncHandler(async (data) => {
   const response = await axiosInstance.post(
     "http://localhost:5000/api/v1/register",
     data,
-    {
-      withCredentials: true,
-    },
   );
   return response?.data;
 });
 
 export const loginApi = async (data) => {
   try {
-    const response = await axiosInstance.post("/api/v1/login", data, {
-      withCredentials: true,
-    });
+    const response = await axiosInstance.post("/api/v1/login", data);
     return response?.data;
   } catch (error) {
     console.log("error in login api");
@@ -34,9 +29,7 @@ export const refreshTokenApi = async () => {
 
 export const logoutApi = async () => {
   try {
-    const response = await axiosInstance.get("/api/v1/logout", {
-      withCredentials: true,
-    });
+    const response = await axiosInstance.get("/api/v1/logout");
     return response?.data;
   } catch (error) {
     console.log("error in logout api", error);
@@ -45,9 +38,7 @@ export const logoutApi = async () => {
 
 export const getMeApi = async () => {
   try {
-    const response = await axiosInstance.get("/api/v1/me", {
-      withCredentials: true,
-    });
+    const response = await axiosInstance.get("/api/v1/me");
     return response?.data;
   } catch (error) {
     console.log("error in getme api", error);

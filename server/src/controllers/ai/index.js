@@ -27,7 +27,6 @@ export const chat = async (req, res) => {
   }
 };
 
-
 export const Gchat = async (req, res) => {
   try {
     const { prompt } = req.params;
@@ -36,7 +35,7 @@ export const Gchat = async (req, res) => {
       return customError(res, 400, {}, "Prompt is required.");
     }
 
-    const response = await GeminiAPI(prompt)
+    const response = await GeminiAPI(prompt);
 
     if (!response) {
       return customError(

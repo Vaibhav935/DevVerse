@@ -1,7 +1,9 @@
 import axios from "axios";
+import { refreshTokenApi } from "../services/auth";
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
 });
 
 // Service to automatically refresh token
@@ -10,12 +12,12 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   (response) => response,
 
-  (error) => {
+  async (error) => {
     if (
       error.response?.statusCode == 401 &&
       error.response.message === "Invalid access token"
     ) {
-      const newAccessToken = "generatedtoken";
+      const newAccessToken = await refreshTokenApi();
       console.log(error);
     }
 

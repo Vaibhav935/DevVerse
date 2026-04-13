@@ -8,5 +8,4 @@ router.get("/read", folderController.readFolder);
 router.delete("/delete", folderController.deleteFolder);
 router.put("/update", folderController.updateFolder);
 
-
 export default router;

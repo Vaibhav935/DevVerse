@@ -7,10 +7,10 @@ import TerminalComponent from "../../features/terminal/components/Terminal";
 
 const Body = () => {
   return (
-    <div className="flex h-full">
+    <div className="flex h-full w-full">
       <SideBar />
       <SideBarExpansion />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         <CodeEditor />
         <TerminalComponent />
       </div>
