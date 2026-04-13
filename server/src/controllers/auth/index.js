@@ -44,6 +44,7 @@ export const register = asyncHandler(async (req, res) => {
     const refreshToken = jwt.sign(
       {
         id: newUser._id,
+        username,
       },
       config.JWT_SECRET,
       {
@@ -59,6 +60,7 @@ export const register = asyncHandler(async (req, res) => {
     const accessToken = jwt.sign(
       {
         id: newUser._id,
+        username,
       },
       config.JWT_SECRETT,
       {
@@ -119,18 +121,26 @@ export const login = asyncHandler(async (req, res) => {
   //   return customError(res, 400, {}, "Invalid email or password");
   // }
 
-  const refreshToken = jwt.sign({ id: user._id }, config.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+  const refreshToken = jwt.sign(
+    { id: user._id, username: user.username },
+    config.JWT_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
 
   const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
 
   user.refreshToken = refreshTokenHash;
   await user.save();
 
-  const accessToken = jwt.sign({ id: user._id }, config.JWT_SECRET, {
-    expiresIn: "15m",
-  });
+  const accessToken = jwt.sign(
+    { id: user._id, username: user.username },
+    config.JWT_SECRET,
+    {
+      expiresIn: "15m",
+    },
+  );
 
   const options = {
     httpOnly: true,
@@ -201,6 +211,7 @@ export const refreshToken = asyncHandler(async (req, res) => {
   const accessToken = jwt.sign(
     {
       id: decoded.id,
+      username: user.username,
     },
     config.JWT_SECRET,
     {
@@ -211,6 +222,7 @@ export const refreshToken = asyncHandler(async (req, res) => {
   const newRefreshToken = jwt.sign(
     {
       id: decoded.id,
+      username: user.username,
     },
     config.JWT_SECRET,
     {

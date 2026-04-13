@@ -27,10 +27,14 @@ const SideBarExpansion = () => {
   const deleteNode = (nodes, id) => {
     return nodes
       .filter((node) => node.id !== id)
-      .map((node) => ({
-        ...node,
-        children: node.children ? deleteNode(node.children, id) : [],
-      }));
+      .map((node) => {
+        if (node.children) {
+          return {
+            ...node,
+            children: node.children ? deleteNode(node.children, id) : [],
+          };
+        }
+      });
   };
 
   const createFile = (parentId = null) => {

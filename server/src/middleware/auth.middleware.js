@@ -1,26 +1,47 @@
 import jwt from "jsonwebtoken";
 import { customError } from "../utils/response.utils.js";
-import UserModel from "../models/user.model.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    const { refreshToken, accessToken } = req.cookies;
+    const { accessToken } = req.cookies;
 
-    if (!refreshToken || !accessToken) {
+    if (!accessToken) {
       return customError(res, 400, {}, "Unauthorized user");
     }
 
     const decode = jwt.verify(accessToken, process.env.JWT_SECRET);
 
-    const user = await UserModel.findById(decode.id).select("-password");
+    if (!decode) throw new Error("Something went wronnt");
 
-    if (!user) throw new Error("Something went wronnt");
+    req.user = {
+      id: decode.id,
+      username: decode.username,
+    };
 
-    req.user = user;
-
-    next();
+    return next();
   } catch (error) {
-    console.log(error);
-    return customError(res, 500, {}, "Error in auth middleware", error);
+    if (error.name !== "TokenExpiredError" || !refreshToken) {
+      return customError(res, 401, {}, "Authentication Invalid");
+    }
+    const { refreshToken } = req.cookies;
+
+    try {
+      const refreshPayload = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+      const newAccessToken = jwt.sign(
+        { userId: refreshPayload?.userId, name: refreshPayload?.name },
+        process.env.JWT_SECRET,
+        { expiresIn: "15m" },
+      );
+
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        sameSite: "strict",
+      });
+      req.user = { userId: refreshPayload.userId, name: refreshPayload.name };
+      return next();
+    } catch (error) {
+      return customError(res, 401, {}, "Authentication Invalid");
+    }
   }
 };
