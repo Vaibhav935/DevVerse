@@ -1,8 +1,33 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { FaFileCirclePlus, FaFolderPlus } from "react-icons/fa6";
+import { useQuery } from "@tanstack/react-query";
+import { readFolderApi } from "../../services/folder";
+import { nanoid } from "nanoid";
 
 const SideBarExpansion = () => {
   const [tree, setTree] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    data: folderStructure,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["folders"],
+    queryFn: () => readFolderApi(),
+  });
+
+  useEffect(() => {
+    if (isLoading) {
+      setLoading(true);
+    }
+
+    if (folderStructure) {
+      setTree(folderStructure?.data);
+      setLoading(false);
+    }
+  }, [folderStructure]);
 
   const addNode = (nodes, parentId, newNode) => {
     return nodes.map((node) => {
@@ -127,8 +152,9 @@ const SideBarExpansion = () => {
       </div>
 
       <div className="flex flex-col gap-1">
+        {loading ? <h1>Loading...</h1> : ""}
         {tree.map((node) => (
-          <TreeNode key={node.id} node={node} />
+          <TreeNode key={nanoid()} node={node} />
         ))}
       </div>
     </div>

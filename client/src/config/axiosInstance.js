@@ -19,6 +19,7 @@ axiosInstance.interceptors.response.use(
     ) {
       const newAccessToken = await refreshTokenApi();
       console.log(error);
+      return;
     }
 
     if (
@@ -27,6 +28,7 @@ axiosInstance.interceptors.response.use(
     ) {
       window.location.href = "/login";
       console.log(error);
+      return;
     }
   },
 );

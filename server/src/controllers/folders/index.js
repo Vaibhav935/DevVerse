@@ -4,7 +4,7 @@ import { customError, success } from "../../utils/response.utils.js";
 
 export const createFolder = async (req, res) => {
   const { folderName } = req.body;
-  const currentDir = path.resolve() + "/assets";
+  const currentDir = path.resolve() + "/assets/root";
 
   fs.mkdir(`${currentDir}/${folderName}`, { recursive: true }, (err) => {
     if (err) {
@@ -16,22 +16,25 @@ export const createFolder = async (req, res) => {
 };
 
 export const readFolder = async (req, res) => {
-  const { folderName } = req.query;
-  console.log(folderName);
-  const currentDir = path.resolve() + "/assets";
+  const currentDir = path.resolve() + "/assets/";
 
-  fs.readdir(`${currentDir}/${folderName}`, (err, files) => {
+  fs.readdir(`${currentDir}`, { withFileTypes: true }, (err, files) => {
     if (err) {
       return customError(res, 500, {}, err.message, err);
     } else {
-      return success(res, { files }, "Folder contents retrieved successfully");
+      const result = files.map((file) => ({
+        name: file.name,
+        type: file.isDirectory() ? "folder" : "file",
+        path: currentDir,
+      }));
+      return success(res, result, "Folder contents retrieved successfully");
     }
   });
 };
 
 export const deleteFolder = async (req, res) => {
   const { folderName } = req.query;
-  const currentDir = path.resolve() + "/assets";
+  const currentDir = path.resolve() + "/assets/root";
 
   fs.rm(`${currentDir}/${folderName}`, { recursive: true }, (err) => {
     if (err) {
@@ -44,7 +47,7 @@ export const deleteFolder = async (req, res) => {
 
 export const updateFolder = async (req, res) => {
   const { oldFolderName, newFolderName } = req.body;
-  const currentDir = path.resolve() + "/assets";
+  const currentDir = path.resolve() + "/assets/root";
 
   fs.rename(
     `${currentDir}/${oldFolderName}`,
