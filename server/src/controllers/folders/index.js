@@ -2,6 +2,32 @@ import fs from "fs";
 import path from "path";
 import { customError, success } from "../../utils/response.utils.js";
 
+const buildTree = (dirPath) => {
+  const files = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  return files.map((file) => {
+    const fullPath = path.join(dirPath, file.name);
+
+    if (file.isDirectory()) {
+      return {
+        id: "",
+        path: fullPath,
+        name: file.name,
+        type: "folder",
+        children: buildTree(fullPath) || [],
+      };
+    }
+
+    return {
+      id: "",
+      name: file.name,
+      type: "file",
+      path: fullPath,
+      chacha: "ddkdkd",
+    };
+  });
+};
+
 export const createFolder = async (req, res) => {
   const { folderName } = req.body;
   const currentDir = path.resolve() + "/assets/root";
@@ -16,18 +42,18 @@ export const createFolder = async (req, res) => {
 };
 
 export const readFolder = async (req, res) => {
-  const currentDir = path.resolve() + "/assets/";
+  const rootPath = path.resolve() + "/assets/";
 
-  fs.readdir(`${currentDir}`, { withFileTypes: true }, (err, files) => {
+  console.log("req aai");
+
+  fs.readdir(`${rootPath}`, { withFileTypes: true }, (err, files) => {
     if (err) {
+      console.log("rror aa gaya -> ", err);
       return customError(res, 500, {}, err.message, err);
     } else {
-      const result = files.map((file) => ({
-        name: file.name,
-        type: file.isDirectory() ? "folder" : "file",
-        path: currentDir,
-      }));
-      return success(res, result, "Folder contents retrieved successfully");
+
+      const tree = buildTree(rootPath);
+      return success(res, tree, "Folder contents retrieved successfully");
     }
   });
 };

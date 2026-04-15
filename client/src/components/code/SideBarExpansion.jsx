@@ -4,6 +4,8 @@ import { FaFileCirclePlus, FaFolderPlus } from "react-icons/fa6";
 import { useQuery } from "@tanstack/react-query";
 import { readFolderApi } from "../../services/folder";
 import { nanoid } from "nanoid";
+import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowDown } from "react-icons/io";
 
 const SideBarExpansion = () => {
   const [tree, setTree] = useState([]);
@@ -22,6 +24,8 @@ const SideBarExpansion = () => {
     if (isLoading) {
       setLoading(true);
     }
+
+    folderStructure?.data.filter((node) => (node.id = nanoid()));
 
     if (folderStructure) {
       setTree(folderStructure?.data);
@@ -103,16 +107,25 @@ const SideBarExpansion = () => {
   };
 
   const TreeNode = ({ node }) => {
-    const [expanded, setExpanded] = useState(true);
+    const [expanded, setExpanded] = useState(false);
 
     return (
       <div style={{ marginLeft: "10px" }}>
-        <div className="flex justify-between items-center group">
-          <span
-            onClick={() => node.type === "folder" && setExpanded(!expanded)}
-            className="cursor-pointer"
-          >
-            {node.type === "folder" ? "📁" : "📄"} {node.name}
+        <div
+          onClick={() => node.type === "folder" && setExpanded(!expanded)}
+          className="flex justify-between items-center group hover:bg-[#eef7ff]/10 p-1 rounded cursor-pointer w-full active:border-blue-300 select-none "
+        >
+          <span className="cursor-pointer w-full flex items-center gap-2 ">
+            {node.type === "folder" ? (
+              !expanded ? (
+                <IoIosArrowForward />
+              ) : (
+                <IoIosArrowDown />
+              )
+            ) : (
+              "📄"
+            )}{" "}
+            {node.name}
           </span>
 
           <div className="hidden group-hover:flex gap-2">
@@ -129,7 +142,7 @@ const SideBarExpansion = () => {
 
         {expanded &&
           node.children?.map((child) => (
-            <TreeNode key={child.id} node={child} />
+            <TreeNode key={Math.random()} node={child} />
           ))}
       </div>
     );
@@ -153,7 +166,7 @@ const SideBarExpansion = () => {
 
       <div className="flex flex-col gap-1">
         {loading ? <h1>Loading...</h1> : ""}
-        {tree.map((node) => (
+        {tree?.map((node) => (
           <TreeNode key={nanoid()} node={node} />
         ))}
       </div>
