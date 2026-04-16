@@ -28,7 +28,13 @@ export const readFolderApi = async (data) => {
   }
 };
 
-export const deleteFolderApi = asyncHandler(async (data) => {
-  const response = await axiosInstance.delete("/api/v1/folder/delete", data);
-  return response?.data;
-});
+export const deleteFolderApi = async (path) => {
+  try {
+    const response = await axiosInstance.delete("/api/v1/folder/delete", {
+      params: { path },
+    });
+    return response?.data;
+  } catch (error) {
+    console.log("error in delete folder api, ", error);
+  }
+};

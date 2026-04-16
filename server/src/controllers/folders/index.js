@@ -64,10 +64,10 @@ export const readFolder = async (req, res) => {
 };
 
 export const deleteFolder = async (req, res) => {
-  const { folderName } = req.query;
-  const currentDir = path.resolve() + "/assets/root";
+  const { path: folderName } = req.query;
+  // const currentDir = path.resolve() + "/assets/root";
 
-  fs.rm(`${currentDir}/${folderName}`, { recursive: true }, (err) => {
+  fs.rm(folderName, { recursive: true }, (err) => {
     if (err) {
       return customError(res, 500, {}, err.message, err);
     } else {

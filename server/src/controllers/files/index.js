@@ -64,14 +64,14 @@ export const renameFile = async (req, res) => {
 };
 
 export const deleteFile = async (req, res) => {
-  const { fileName } = req.body;
+  const { path: filePath } = req.query;
 
-  if (!fileName) {
+  if (!filePath) {
     return customError(res, 400, {}, "File name is required");
   }
 
-  const currentPath = process.cwd();
-  const filePath = path.join(currentPath, "assets", fileName);
+  // const currentPath = process.cwd();
+  // const filePath = path.join(currentPath, "assets", fileName);
 
   fs.unlink(filePath, (err) => {
     if (err) {

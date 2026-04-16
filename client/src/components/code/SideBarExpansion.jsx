@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { FaFileCirclePlus, FaFolderPlus } from "react-icons/fa6";
 import { useQuery } from "@tanstack/react-query";
-import { createFolderApi, readFolderApi } from "../../services/folder";
+import {
+  createFolderApi,
+  deleteFolderApi,
+  readFolderApi,
+} from "../../services/folder";
 import { nanoid } from "nanoid";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import { RiDeleteBinFill } from "react-icons/ri";
-import { createFileApi } from "../../services/file";
+import { createFileApi, deleteFileApi } from "../../services/file";
 
 const SideBarExpansion = () => {
   const [tree, setTree] = useState([]);
@@ -104,7 +108,6 @@ const SideBarExpansion = () => {
   };
 
   const deleteNode = (nodes, id) => {
-    console.log(nodes, id);
     return nodes
       .filter((node) => node?.id !== id)
       .map((node) => {
@@ -117,8 +120,32 @@ const SideBarExpansion = () => {
       });
   };
 
+  const findNode = (nodes, id) => {
+    for (let node of nodes) {
+      if (node.id === id) return node;
+
+      if (node.children) {
+        const found = findNode(node.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
   const handleDelete = (id) => {
     if (!window.confirm("Delete this item?")) return;
+
+    const node = findNode(tree, id);
+
+    if (!node) return;
+
+    if (node.type === "folder") {
+      deleteFolderApi(node.path);
+    } else {
+      console.log("api tk bat pochi")
+      deleteFileApi(node.path);
+    }
+
     setTree((prev) => deleteNode(prev, id));
   };
 
