@@ -1,10 +1,14 @@
 import axiosInstance from "../../config/axiosInstance";
 import asyncHandler from "../../utils/asyncHandler";
 
-export const createFolderApi = asyncHandler(async (data) => {
-  const response = await axiosInstance.post("/api/v1/folder/create", data);
-  return response?.data;
-});
+export const createFolderApi = async (data) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/folder/create", data);
+    return response?.data;
+  } catch (error) {
+    throw new Error("Error in creating folder api", error);
+  }
+};
 
 export const renameFolderApi = asyncHandler(async (data) => {
   try {

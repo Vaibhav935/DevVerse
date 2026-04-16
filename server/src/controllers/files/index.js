@@ -3,15 +3,23 @@ import { customError, success } from "../../utils/response.utils.js";
 import path from "path";
 
 export const createFile = async (req, res) => {
-  const { fileName, data } = req.body;
-  const currentPath = process.cwd();
+  const { name: fileName, path: folderPath, data = "" } = req.body;
 
-  const filePath = path.join(currentPath, "assets", fileName);
+  console.log(req.body);
+  // const currentPath = process.cwd();
+
+  const filePath = path.join(folderPath, fileName);
 
   // try {
   //   await fs.access(filePath);
   //   return customError(res, 500, {}, "File already exists");
   // } catch {}
+
+  //   const fs = require('fs');
+  // fs.appendFile('log.txt', 'New log entry\n', (err) => {
+  //   if (err) throw err;
+  //   console.log('Content appended (or file created)!');
+  // });
 
   fs.writeFile(filePath, data, (err) => {
     if (err) {

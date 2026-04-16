@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { customError, success } from "../../utils/response.utils.js";
+import crypto from "crypto";
+
+const generateId = (input) =>
+  crypto.createHash("md5").update(input).digest("hex");
 
 const buildTree = (dirPath) => {
   const files = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -10,7 +14,7 @@ const buildTree = (dirPath) => {
 
     if (file.isDirectory()) {
       return {
-        id: "",
+        id: generateId(fullPath),
         path: fullPath,
         name: file.name,
         type: "folder",
@@ -19,7 +23,7 @@ const buildTree = (dirPath) => {
     }
 
     return {
-      id: "",
+      id: generateId(fullPath),
       name: file.name,
       type: "file",
       path: fullPath,
@@ -29,29 +33,30 @@ const buildTree = (dirPath) => {
 };
 
 export const createFolder = async (req, res) => {
-  const { folderName } = req.body;
-  const currentDir = path.resolve() + "/assets/root";
+  const { path: rootPath, name: folderName } = req.body;
+  // const rootPath = path.resolve() + "/assets/root";
 
-  fs.mkdir(`${currentDir}/${folderName}`, { recursive: true }, (err) => {
-    if (err) {
-      return customError(res, 500, {}, err.message, err);
-    } else {
-      return success(res, {}, "Folder created successfully");
-    }
-  });
+  try {
+    fs.mkdir(`${rootPath}/${folderName}`, { recursive: true }, (err) => {
+      if (err) {
+        return customError(res, 500, {}, err.message, err);
+      } else {
+        return success(res, {}, "Folder created successfully");
+      }
+    });
+  } catch (error) {
+    console.log("error in createing folder", error);
+  }
 };
 
 export const readFolder = async (req, res) => {
-  const rootPath = path.resolve() + "/assets/";
-
-  console.log("req aai");
+  const rootPath = path.resolve() + "/assets/root";
 
   fs.readdir(`${rootPath}`, { withFileTypes: true }, (err, files) => {
     if (err) {
       console.log("rror aa gaya -> ", err);
       return customError(res, 500, {}, err.message, err);
     } else {
-
       const tree = buildTree(rootPath);
       return success(res, tree, "Folder contents retrieved successfully");
     }

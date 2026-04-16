@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { FaFileCirclePlus, FaFolderPlus } from "react-icons/fa6";
 import { useQuery } from "@tanstack/react-query";
-import { readFolderApi } from "../../services/folder";
+import { createFolderApi, readFolderApi } from "../../services/folder";
 import { nanoid } from "nanoid";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
+import { RiDeleteBinFill } from "react-icons/ri";
+import { createFileApi } from "../../services/file";
 
 const SideBarExpansion = () => {
   const [tree, setTree] = useState([]);
@@ -23,11 +25,19 @@ const SideBarExpansion = () => {
   useEffect(() => {
     if (isLoading) {
       setLoading(true);
+      return;
     }
 
-    folderStructure?.data.filter((node) => (node.id = nanoid()));
+    // const addIds = (nodes) => {
+    //   return nodes.map((node) => ({
+    //     ...node,
+    //     id: node.id || nanoid(),
+    //     children: node.children ? addIds(node.children) : [],
+    //   }));
+    // };
 
     if (folderStructure) {
+      // const updatedTree = addIds(folderStructure.data);
       setTree(folderStructure?.data);
       setLoading(false);
     }
@@ -53,20 +63,7 @@ const SideBarExpansion = () => {
     });
   };
 
-  const deleteNode = (nodes, id) => {
-    return nodes
-      .filter((node) => node.id !== id)
-      .map((node) => {
-        if (node.children) {
-          return {
-            ...node,
-            children: node.children ? deleteNode(node.children, id) : [],
-          };
-        }
-      });
-  };
-
-  const createFile = (parentId = null) => {
+  const createFile = ({ path, id = null }) => {
     const name = prompt("Enter file name");
     if (!name) return;
 
@@ -76,14 +73,16 @@ const SideBarExpansion = () => {
       type: "file",
     };
 
-    if (!parentId) {
+    createFileApi({ path, name });
+
+    if (!id) {
       setTree((prev) => [...prev, newFile]);
     } else {
-      setTree((prev) => addNode(prev, parentId, newFile));
+      setTree((prev) => addNode(prev, id, newFile));
     }
   };
 
-  const createFolder = (parentId = null) => {
+  const createFolder = ({ path, id = null }) => {
     const name = prompt("Enter folder name");
     if (!name) return;
 
@@ -92,13 +91,30 @@ const SideBarExpansion = () => {
       name,
       type: "folder",
       children: [],
+      // path:
     };
 
-    if (!parentId) {
+    createFolderApi({ path, name });
+
+    if (!id) {
       setTree((prev) => [...prev, newFolder]);
     } else {
-      setTree((prev) => addNode(prev, parentId, newFolder));
+      setTree((prev) => addNode(prev, id, newFolder));
     }
+  };
+
+  const deleteNode = (nodes, id) => {
+    console.log(nodes, id);
+    return nodes
+      .filter((node) => node?.id !== id)
+      .map((node) => {
+        return {
+          ...node,
+          children: node.children ? deleteNode(node.children, id) : [],
+        };
+
+        return node;
+      });
   };
 
   const handleDelete = (id) => {
@@ -112,11 +128,11 @@ const SideBarExpansion = () => {
     return (
       <div style={{ marginLeft: "10px" }}>
         <div
-          onClick={() => node.type === "folder" && setExpanded(!expanded)}
+          onClick={() => node?.type === "folder" && setExpanded(!expanded)}
           className="flex justify-between items-center group hover:bg-[#eef7ff]/10 p-1 rounded cursor-pointer w-full active:border-blue-300 select-none "
         >
           <span className="cursor-pointer w-full flex items-center gap-2 ">
-            {node.type === "folder" ? (
+            {node?.type === "folder" ? (
               !expanded ? (
                 <IoIosArrowForward />
               ) : (
@@ -125,18 +141,33 @@ const SideBarExpansion = () => {
             ) : (
               "📄"
             )}{" "}
-            {node.name}
+            {node?.name}
           </span>
 
           <div className="hidden group-hover:flex gap-2">
-            {node.type === "folder" && (
+            {node?.type === "folder" && (
               <>
-                <button onClick={() => createFile(node.id)}>📄</button>
-                <button onClick={() => createFolder(node.id)}>📁</button>
+                <button
+                  className="cursor-pointer"
+                  onClick={() => createFile({ path: node.path, id: node.id })}
+                >
+                  <FaFileCirclePlus size={14} />
+                </button>
+                <button
+                  className="cursor-pointer"
+                  onClick={() => createFolder({ path: node.path, id: node.id })}
+                >
+                  <FaFolderPlus size={14} />
+                </button>
               </>
             )}
 
-            <button onClick={() => handleDelete(node.id)}>🗑</button>
+            <button
+              className="cursor-pointer"
+              onClick={() => handleDelete(node?.id)}
+            >
+              <RiDeleteBinFill size={14} />
+            </button>
           </div>
         </div>
 

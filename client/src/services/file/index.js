@@ -1,10 +1,14 @@
 import axiosInstance from "../../config/axiosInstance";
 import asyncHandler from "../../utils/asyncHandler";
 
-export const createFileApi = asyncHandler(async (body) => {
-  const response = axiosInstance.post("/api/v1/file/create", body);
-  return response?.data;
-});
+export const createFileApi = async (body) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/file/create", body);
+    return response?.data;
+  } catch (error) {
+    console.log("error in create file api,", error);
+  }
+};
 
 export const renameFileApi = asyncHandler(async (body) => {
   const response = axiosInstance.post("/api/v1/file/rename", data);
