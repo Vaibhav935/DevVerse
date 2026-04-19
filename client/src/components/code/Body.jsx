@@ -12,7 +12,7 @@ const Body = () => {
       <SideBarExpansion />
       <div className="flex-1 flex flex-col min-h-0">
         <CodeEditor />
-        <TerminalComponent />
+        {/* <TerminalComponent /> */}
       </div>
       <AiChatSidebar />
     </div>
